@@ -11,8 +11,8 @@ building(){//not sure if this would work
 		return building;
 	}
 }
-Complicated_logic(building_ID, modType, linkType){
-	if(modType == ){
+Complicated_logic(building_ID, modType, linkType){//not 100% on if this idea would work, we may need a separate function to do the math, or do the math in the for loop.
+	if(modType !== null ){
 		switch(modType){
 			case CreditsProduction:
 			case CreditsPackageSize:
@@ -20,13 +20,15 @@ Complicated_logic(building_ID, modType, linkType){
 		}
 	}
 
-	if(linkType == ){
+	if(linkType !== null ){
 		switch(linkType){
 			case PowerplantCreditBonus:
 			case TiberiumCreditProduction:
 			case 
 		}
 	}
+	var Prodution = city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].TotalValue;
+	var LinkType = city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].ConnectedLinkTypes.d[linkType].Value;
 }
 upgradeBuilding(obj){
 	if(obj = unit_obj){
