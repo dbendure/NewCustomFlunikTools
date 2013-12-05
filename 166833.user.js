@@ -39,7 +39,7 @@
 						r : 1,
 						s : 1,
 						a : 1,
-						x : 0,
+						ResOnly : 0,
 						y: 1,
 						z: 1,
 
@@ -228,16 +228,16 @@
 									window.FlunikTools.Main.getInstance().OffFunction();
 									CommandBuildingChoice.setLabel("R = 0");
 									//BuildingsButton.setLabel("B.Hold");
-									_this.x = 0;
-									console.log(_this.x + " normal mode");
+									_this.ResOnly = 0;
+									console.log(_this.ResOnly + " normal mode");
 									//alert("Stopped auto-update");
 								} else {
 									window.FlunikTools.Main.getInstance().OnFunction();
 									CommandBuildingChoice.setLabel("R = 1");
 									//BuildingsButton.setLabel("B.Hold");
 									//alert("Stop auto-update to return value to 0");
-									_this.x = 1;
-									console.log(_this.x + " ResOnly mode");
+									_this.ResOnly = 1;
+									console.log(_this.ResOnly + " ResOnly mode");
 								}
 							}, this);
 							worldResBuildingChoice.addListener("click", function (e) {
@@ -563,95 +563,24 @@
 						},
 
 
-						totalRepairTime: function ( airRT, vehRT, infRT) {
+						totalRepairTime : function ( airRT, vehRT, infRT) {
 							return Math.max(airRT, vehRT, infRT);
+
 <<<<<<< HEAD
 
 						},
 
 
 =======
+
 						},
+
 >>>>>>> d29850c9bc7581ddd0189e32c5e3af5407a72727
-//						************************************************************************************************************************************************************************************************************
-//						Just for fun
-//						***********************************************************************************************************************************************************************************************************						
-						distanceFromCenter: function (city){
-							//type this into console log of the page to read this function: var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_CurrentCity();window.FlunikTools.Main.getInstance().distanceFromCenter(city);
-							if(city){
-								var cityX = city.get_PosX();
-								var cityY = city.get_PosY();
-								var x = 500;
-								var y = 500;
-								var title = "You are here{";
-								var NQuad = "North";
-								var EQuad = "East";
-								var SQuad = "South";
-								var WQuad = "West";
-								var run;
-								var rise;
-								var dist = Math.sqrt( ( Math.pow( ( cityX - x ) ,2 ) ) + ( Math.pow( ( cityY - y ) ,2 ) ) );
-
-								var totdis = "Total Dist:"+ Math.round(dist);
-
-
-								//slope= ( rise / run  );
-								//y - y1 = m(x -x1);
-								//standard
-								//console.log("y = (" + rise + " / " + run + ")*(x - " + x + ") + " + y + ";");
-								//console.log("y = (" + rise + " / " + run + ")*(x - " + cityX + ") + " + cityY + ";");
-
-
-								//y = North +500 - 500 farthest away is 0
-								//x = East 500 + 500 farthest away is 1000
-								//-y = South 500 +500 farthest away is 1000
-								//-x = West +500 - 500 farthest away is 0
-								if (cityX > x && cityY > y){
-									var rise = ( cityY - y);
-									var run = (cityX - x);
-									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
-
-									var postion =title +" "+ SQuad +" "+ EQuad +" "+ cityX +" "+ cityY +" "+ distxy +" "+ totdis ;
-									return (postion);
-								}
-
-								if (cityX > x && cityY < y){
-									var rise = (y - cityY);
-									var run = (cityX - x);
-									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
-
-									var postion =title +" "+ NQuad +" "+ EQuad +" "+ cityX +" "+ cityY +" "+ distxy + " " + totdis;
-									return (postion);
-								}
-
-								if (cityX < x && cityY > y){
-									var rise = (cityY - y);
-									var run = (x - cityX);
-									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
-
-									var postion =title +" "+ SQuad +" "+ WQuad +" "+ cityX +" "+ cityY +" "+ distxy + " " + totdis;
-									return (postion);
-								}
-
-								if (cityX < x && cityY < y){
-									var rise = (y - cityY);
-									var run = (x - cityX);
-									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
-
-									var postion =title +" "+ NQuad +" "+ WQuad  +" "+ cityX +" "+ cityY  +" "+ distxy + " " + totdis;
-									return (postion);
-								}
-
-
-							}
-						},
-//						************************************************************************************************************************************************************************************************************
-//						End Just for fun
-//						***********************************************************************************************************************************************************************************************************						
+					***********************************************************************************************************************************************************************************************************						
 
 
 
-						/*
+/*						
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                                The Defense Function
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -861,7 +790,7 @@
 							var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d[nCity];
 							var buildings = city.get_Buildings();
 							var baseName = city.m_SupportDedicatedBaseName;
-							//console.log(baseName,  _this.x, _this.y, _this.z);
+							//console.log(baseName,  _this.ResOnly, _this.y, _this.z);
 							var airRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Aircraft, false);
 							var vehRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Vehicle, false);
 							var infRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Infantry, false);
@@ -939,7 +868,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 
 								//	/*	 
-								if(	(tech == ClientLib.Base.ETechName.Factory)	&& ((totalRT == vehRT) && (_this.x == 0))){
+								if(	(tech == ClientLib.Base.ETechName.Factory)	&& ((totalRT == vehRT) && (_this.ResOnly == 0))){
 									var offRT = building;
 									var offRT_obj = {
 											cityid: city.get_Id(),
@@ -957,7 +886,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if(	(tech == ClientLib.Base.ETechName.Barracks) &&	((totalRT == infRT)&& (_this.x == 0))){
+								if(	(tech == ClientLib.Base.ETechName.Barracks) &&	((totalRT == infRT)&& (_this.ResOnly == 0))){
 									var offRT = building;
 									var offRT_obj = {
 											cityid: city.get_Id(),
@@ -974,7 +903,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if(	(tech == ClientLib.Base.ETechName.Airport) && ((totalRT == airRT)&& (_this.x == 0)))	{
+								if(	(tech == ClientLib.Base.ETechName.Airport) && ((totalRT == airRT)&& (_this.ResOnly == 0)))	{
 									var offRT = building;
 									var offRT_obj = {
 											cityid: city.get_Id(),
@@ -993,7 +922,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 								//    */
 								//      /*
 
-								if (	(tech == ClientLib.Base.ETechName.Construction_Yard ) && ((building.get_CurrentLevel() < baselvl) && (totalRT < 14400)&& (_this.x == 0))	){
+								if (	(tech == ClientLib.Base.ETechName.Construction_Yard ) && ((building.get_CurrentLevel() < baselvl) && (totalRT < 14400)&& (_this.ResOnly == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1009,7 +938,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if (	(tech ==ClientLib.Base.ETechName.Command_Center ) && ((building.get_CurrentLevel() <= offLvl) && (totalRT < 14400)&& (_this.x == 0))	){
+								if (	(tech ==ClientLib.Base.ETechName.Command_Center ) && ((building.get_CurrentLevel() <= offLvl) && (totalRT < 14400)&& (_this.ResOnly == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1025,7 +954,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if (	(tech ==ClientLib.Base.ETechName.Defense_HQ ) && ((building.get_CurrentLevel() <= defLvl) && (totalRT < 14400)&& (_this.x == 0))	){
+								if (	(tech ==ClientLib.Base.ETechName.Defense_HQ ) && ((building.get_CurrentLevel() <= defLvl) && (totalRT < 14400)&& (_this.ResOnly == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1041,7 +970,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if (	(tech == ClientLib.Base.ETechName.Defense_Facility) &&  ((building.get_CurrentLevel() <= defLvl + 3) && (totalRT < 14400)&& (_this.x == 0))	){
+								if (	(tech == ClientLib.Base.ETechName.Defense_Facility) &&  ((building.get_CurrentLevel() <= defLvl + 3) && (totalRT < 14400)&& (_this.ResOnly == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1059,7 +988,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								//	*/ 
 								//	/*
-								if (((tech ==ClientLib.Base.ETechName.Support_Air)||(tech == ClientLib.Base.ETechName.Support_Ion)||(tech == ClientLib.Base.ETechName.Support_Art)) && (( totalRT < 14400) &&  (building.get_CurrentLevel() <= defLvl + 3)&& (_this.x == 0))	){
+								if (((tech ==ClientLib.Base.ETechName.Support_Air)||(tech == ClientLib.Base.ETechName.Support_Ion)||(tech == ClientLib.Base.ETechName.Support_Art)) && (( totalRT < 14400) &&  (building.get_CurrentLevel() <= defLvl + 3)&& (_this.ResOnly == 0))	){
 									var support = building;
 									var support_obj = {
 											cityid: city.get_Id(),
@@ -1483,9 +1412,9 @@ Upgrade decisions
 							maxarr = [refarr[0], powarr[0], hararr[0], hararr1[0], accarr[0], silarr[0]];
 							maxarr.sort(function(a,b){return b-a});
 							//	  /* 
-							if((offRT_obj != undefined)&& (_this.x == 0)){
+							if((offRT_obj != undefined)&& (_this.ResOnly == 0)){
 
-								console.log(offRT_obj, _this.x);
+								console.log(offRT_obj, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", offRT_obj, null, null, true);
 								offRT_obj = {};
 								break;
@@ -1493,9 +1422,9 @@ Upgrade decisions
 
 							//	  */
 							//	  /* 	  
-							if((building_obj != undefined) && (_this.x == 0) ){
+							if((building_obj != undefined) && (_this.ResOnly == 0) ){
 
-								console.log(building_obj, _this.x);
+								console.log(building_obj, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", building_obj, null, null, true);
 								building_obj = {};
 								break;
@@ -1505,15 +1434,15 @@ Upgrade decisions
 							//	  */ 
 
 							if((LowResbuilding_obj != undefined)){
-								console.log(LowResbuilding_obj, _this.x );
+								console.log(LowResbuilding_obj, _this.ResOnly );
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", LowResbuilding_obj, null, null, true);
 								LowResbuilding_obj = {};
 								break;
 							}
 							//	  /*
-							if((support_obj != undefined)&& (_this.x == 0)){
+							if((support_obj != undefined)&& (_this.ResOnly == 0)){
 
-								console.log(support_obj, _this.x);
+								console.log(support_obj, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", support_obj, null, null, true);
 								support_obj = {};
 
@@ -1524,16 +1453,16 @@ Upgrade decisions
 							}
 							//	  */
 
-							if( (Ref_obj != undefined) && (refarr.toString() != "") && (maxarr[0] == refarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||( building.get_CurrentLevel() > 2)*/
-								console.log(Ref_obj, refarr, _this.x);
+							if( (Ref_obj != undefined) && (refarr.toString() != "") && (maxarr[0] == refarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||( building.get_CurrentLevel() > 2)*/
+								console.log(Ref_obj, refarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Ref_obj, null, null, true);
 								Ref_obj = {};
 								refarr = [];
 								maxarr = [];
 								break; }
 
-							if(  (Pow_obj != undefined)&& (powarr.toString() != "") && (maxarr[0] == powarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
-								console.log(Pow_obj, powarr, _this.x);
+							if(  (Pow_obj != undefined)&& (powarr.toString() != "") && (maxarr[0] == powarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+								console.log(Pow_obj, powarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Pow_obj, null, null, true);
 								Pow_obj = {};
 								powarr = [];
@@ -1541,8 +1470,8 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Har_obj != undefined)&& (hararr.toString()!= "") && (maxarr[0] == hararr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
-								console.log(Har_obj, hararr, _this.x);
+							if( (Har_obj != undefined)&& (hararr.toString()!= "") && (maxarr[0] == hararr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+								console.log(Har_obj, hararr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Har_obj, null, null, true);
 								Har_obj = {};
 								hararr = [];
@@ -1550,8 +1479,8 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Har1_obj != undefined)&& (hararr1.toString() != "") && (maxarr[0] == hararr1[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
-								console.log(Har1_obj, hararr1, _this.x);
+							if( (Har1_obj != undefined)&& (hararr1.toString() != "") && (maxarr[0] == hararr1[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+								console.log(Har1_obj, hararr1, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Har1_obj, null, null, true);
 								Har1_obj = {};
 								hararr1 = [];
@@ -1559,8 +1488,8 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Acc_obj != undefined)&& (accarr.toString() != "") && (maxarr[0] == accarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
-								console.log(Acc_obj, accarr, _this.x);
+							if( (Acc_obj != undefined)&& (accarr.toString() != "") && (maxarr[0] == accarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+								console.log(Acc_obj, accarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Acc_obj, null, null, true);
 								Acc_obj = {};
 								accarr = [];
@@ -1568,8 +1497,8 @@ Upgrade decisions
 								break;
 							}
 
-							if((Sil_obj != undefined)&& (silarr.toString() != "") && (maxarr[0] == silarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
-								console.log(Sil_obj, silarr, _this.x);
+							if((Sil_obj != undefined)&& (silarr.toString() != "") && (maxarr[0] == silarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+								console.log(Sil_obj, silarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Sil_obj, null, null, true);
 								Sil_obj = {};
 								silarr = [];
