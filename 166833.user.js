@@ -565,10 +565,14 @@
 
 						totalRepairTime: function ( airRT, vehRT, infRT) {
 							return Math.max(airRT, vehRT, infRT);
+<<<<<<< HEAD
 
 						},
 
 
+=======
+						},
+>>>>>>> d29850c9bc7581ddd0189e32c5e3af5407a72727
 //						************************************************************************************************************************************************************************************************************
 //						Just for fun
 //						***********************************************************************************************************************************************************************************************************						
@@ -861,6 +865,7 @@
 							var airRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Aircraft, false);
 							var vehRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Vehicle, false);
 							var infRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Infantry, false);
+							var totalRT = _this.totalRepairTime(airRT, vehRT, infRT);
 							// var maxRT = math.Max(airRT, vehRT, infRT)
 
 							var baselvl = city.get_LvlBase();
@@ -934,7 +939,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 
 								//	/*	 
-								if(	(tech == ClientLib.Base.ETechName.Factory)	&& ((_this.totalRepairTime(airRT, vehRT, infRT) == vehRT) && (_this.x == 0))){
+								if(	(tech == ClientLib.Base.ETechName.Factory)	&& ((totalRT == vehRT) && (_this.x == 0))){
 									var offRT = building;
 									var offRT_obj = {
 											cityid: city.get_Id(),
@@ -952,7 +957,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if(	(tech == ClientLib.Base.ETechName.Barracks) &&	((_this.totalRepairTime(airRT, vehRT, infRT) == infRT)&& (_this.x == 0))){
+								if(	(tech == ClientLib.Base.ETechName.Barracks) &&	((totalRT == infRT)&& (_this.x == 0))){
 									var offRT = building;
 									var offRT_obj = {
 											cityid: city.get_Id(),
@@ -969,7 +974,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if(	(tech == ClientLib.Base.ETechName.Airport) && ((_this.totalRepairTime(airRT, vehRT, infRT) == airRT)&& (_this.x == 0)))	{
+								if(	(tech == ClientLib.Base.ETechName.Airport) && ((totalRT == airRT)&& (_this.x == 0)))	{
 									var offRT = building;
 									var offRT_obj = {
 											cityid: city.get_Id(),
@@ -988,7 +993,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 								//    */
 								//      /*
 
-								if (	(tech == ClientLib.Base.ETechName.Construction_Yard ) && ((building.get_CurrentLevel() < baselvl) && (_this.totalRepairTime(airRT, vehRT, infRT) < 14400)&& (_this.x == 0))	){
+								if (	(tech == ClientLib.Base.ETechName.Construction_Yard ) && ((building.get_CurrentLevel() < baselvl) && (totalRT < 14400)&& (_this.x == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1004,7 +1009,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if (	(tech ==ClientLib.Base.ETechName.Command_Center ) && ((building.get_CurrentLevel() <= offLvl) && (_this.totalRepairTime(airRT, vehRT, infRT) < 14400)&& (_this.x == 0))	){
+								if (	(tech ==ClientLib.Base.ETechName.Command_Center ) && ((building.get_CurrentLevel() <= offLvl) && (totalRT < 14400)&& (_this.x == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1020,7 +1025,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if (	(tech ==ClientLib.Base.ETechName.Defense_HQ ) && ((building.get_CurrentLevel() <= defLvl) && (_this.totalRepairTime(airRT, vehRT, infRT) < 14400)&& (_this.x == 0))	){
+								if (	(tech ==ClientLib.Base.ETechName.Defense_HQ ) && ((building.get_CurrentLevel() <= defLvl) && (totalRT < 14400)&& (_this.x == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1036,7 +1041,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								}
 
-								if (	(tech == ClientLib.Base.ETechName.Defense_Facility) &&  ((building.get_CurrentLevel() <= defLvl + 3) && (_this.totalRepairTime(airRT, vehRT, infRT) < 14400)&& (_this.x == 0))	){
+								if (	(tech == ClientLib.Base.ETechName.Defense_Facility) &&  ((building.get_CurrentLevel() <= defLvl + 3) && (totalRT < 14400)&& (_this.x == 0))	){
 									var cbuilding = building;
 									//console.log(name);
 									var building_obj = {
@@ -1054,7 +1059,7 @@ Upgrade RT CC CY DHQ DFac and low level resource building Defining
 
 								//	*/ 
 								//	/*
-								if (((tech ==ClientLib.Base.ETechName.Support_Air)||(tech == ClientLib.Base.ETechName.Support_Ion)||(tech == ClientLib.Base.ETechName.Support_Art)) && (( _this.totalRepairTime(airRT, vehRT, infRT) < 14400) &&  (building.get_CurrentLevel() <= defLvl + 3)&& (_this.x == 0))	){
+								if (((tech ==ClientLib.Base.ETechName.Support_Air)||(tech == ClientLib.Base.ETechName.Support_Ion)||(tech == ClientLib.Base.ETechName.Support_Art)) && (( totalRT < 14400) &&  (building.get_CurrentLevel() <= defLvl + 3)&& (_this.x == 0))	){
 									var support = building;
 									var support_obj = {
 											cityid: city.get_Id(),
@@ -1519,7 +1524,7 @@ Upgrade decisions
 							}
 							//	  */
 
-							if( (Ref_obj != undefined) && (refarr.toString() != "") && (maxarr[0] == refarr[0]) && (((_this.totalRepairTime(airRT, vehRT, infRT) < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||( building.get_CurrentLevel() > 2)*/
+							if( (Ref_obj != undefined) && (refarr.toString() != "") && (maxarr[0] == refarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||( building.get_CurrentLevel() > 2)*/
 								console.log(Ref_obj, refarr, _this.x);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Ref_obj, null, null, true);
 								Ref_obj = {};
@@ -1527,7 +1532,7 @@ Upgrade decisions
 								maxarr = [];
 								break; }
 
-							if(  (Pow_obj != undefined)&& (powarr.toString() != "") && (maxarr[0] == powarr[0]) && (((_this.totalRepairTime(airRT, vehRT, infRT) < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if(  (Pow_obj != undefined)&& (powarr.toString() != "") && (maxarr[0] == powarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
 								console.log(Pow_obj, powarr, _this.x);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Pow_obj, null, null, true);
 								Pow_obj = {};
@@ -1536,7 +1541,7 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Har_obj != undefined)&& (hararr.toString()!= "") && (maxarr[0] == hararr[0]) && (((_this.totalRepairTime(airRT, vehRT, infRT) < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if( (Har_obj != undefined)&& (hararr.toString()!= "") && (maxarr[0] == hararr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
 								console.log(Har_obj, hararr, _this.x);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Har_obj, null, null, true);
 								Har_obj = {};
@@ -1545,7 +1550,7 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Har1_obj != undefined)&& (hararr1.toString() != "") && (maxarr[0] == hararr1[0]) && (((_this.totalRepairTime(airRT, vehRT, infRT) < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if( (Har1_obj != undefined)&& (hararr1.toString() != "") && (maxarr[0] == hararr1[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
 								console.log(Har1_obj, hararr1, _this.x);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Har1_obj, null, null, true);
 								Har1_obj = {};
@@ -1554,7 +1559,7 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Acc_obj != undefined)&& (accarr.toString() != "") && (maxarr[0] == accarr[0]) && (((_this.totalRepairTime(airRT, vehRT, infRT) < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if( (Acc_obj != undefined)&& (accarr.toString() != "") && (maxarr[0] == accarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
 								console.log(Acc_obj, accarr, _this.x);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Acc_obj, null, null, true);
 								Acc_obj = {};
@@ -1563,7 +1568,7 @@ Upgrade decisions
 								break;
 							}
 
-							if((Sil_obj != undefined)&& (silarr.toString() != "") && (maxarr[0] == silarr[0]) && (((_this.totalRepairTime(airRT, vehRT, infRT) < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if((Sil_obj != undefined)&& (silarr.toString() != "") && (maxarr[0] == silarr[0]) && (((totalRT < 14400) && (_this.x == 0))||(_this.x == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
 								console.log(Sil_obj, silarr, _this.x);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Sil_obj, null, null, true);
 								Sil_obj = {};

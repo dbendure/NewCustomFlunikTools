@@ -1,0 +1,63 @@
+BuildingautoUpgrade() {
+    foreach (city) {
+        foreach (building) {
+            switch (tech) {
+            case Factory:
+            case Barracks:
+            case Airport:
+                // Is this building's RT the highest RT?
+                break;
+            case ConstructionYard:
+            case CommandCenter:
+            case DefenseFacility:
+            case DeenseHQ:
+            case Support_Air:
+            case Support_Ion:
+            case Support_Art:
+                // What is this building's target level?
+                //  CY >= baseLevel
+                //  CC >= offenseLevel
+                //  DF >= defenseLevel + 3
+                //  DHQ >= defenseLevel
+                //  Support_Air >= defenseLevel + 3
+                //  Support_Ion >= defenseLevel + 3
+                //  Support_Art >= defenseLevel + 3
+                break;
+            case Refinery: // TODO: Can all these production buildings be combined into a single set of logic?
+                if (building_level <= 2) {
+                    // upgrade it
+                } else {
+                    // Complicated logic
+                }
+                break;
+            case Harvester:
+                if (building_level <= 2) {
+                    // upgrade it
+                } else {
+                    // Complicated logic
+                }
+                break;
+            case PowerPlant:
+                if (building_level <= 2) {
+                    // upgrade it
+                } else {
+                    // Complicated logic
+                }
+                break;
+            }
+        }
+
+        var obj = null;
+        if (offense_obj != null) {
+            obj = offense_obj;
+        } else if (city_obj != null) {
+            obj = city_obj;
+        } else if (production_obj != null) {
+            obj = production_obj;
+        }
+
+        if (obj != null) {
+            upgradeBuilding(obj);
+        }
+    }
+}
