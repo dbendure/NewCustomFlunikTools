@@ -563,24 +563,95 @@
 						},
 
 
-						totalRepairTime : function ( airRT, vehRT, infRT) {
+						totalRepairTime: function ( airRT, vehRT, infRT) {
 							return Math.max(airRT, vehRT, infRT);
-
 <<<<<<< HEAD
 
 						},
 
 
 =======
-
-						},
-
+					
 >>>>>>> d29850c9bc7581ddd0189e32c5e3af5407a72727
-					***********************************************************************************************************************************************************************************************************						
+//						************************************************************************************************************************************************************************************************************
+//						Just for fun
+//						***********************************************************************************************************************************************************************************************************						
+						distanceFromCenter: function (city){
+							//type this into console log of the page to read this function: var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_CurrentCity();window.FlunikTools.Main.getInstance().distanceFromCenter(city);
+							if(city){
+								var cityX = city.get_PosX();
+								var cityY = city.get_PosY();
+								var x = 500;
+								var y = 500;
+								var title = "You are here{";
+								var NQuad = "North";
+								var EQuad = "East";
+								var SQuad = "South";
+								var WQuad = "West";
+								var run;
+								var rise;
+								var dist = Math.sqrt( ( Math.pow( ( cityX - x ) ,2 ) ) + ( Math.pow( ( cityY - y ) ,2 ) ) );
+
+								var totdis = "Total Dist:"+ Math.round(dist);
+
+
+								//slope= ( rise / run  );
+								//y - y1 = m(x -x1);
+								//standard
+								//console.log("y = (" + rise + " / " + run + ")*(x - " + x + ") + " + y + ";");
+								//console.log("y = (" + rise + " / " + run + ")*(x - " + cityX + ") + " + cityY + ";");
+
+
+								//y = North +500 - 500 farthest away is 0
+								//x = East 500 + 500 farthest away is 1000
+								//-y = South 500 +500 farthest away is 1000
+								//-x = West +500 - 500 farthest away is 0
+								if (cityX > x && cityY > y){
+									var rise = ( cityY - y);
+									var run = (cityX - x);
+									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
+
+									var postion =title +" "+ SQuad +" "+ EQuad +" "+ cityX +" "+ cityY +" "+ distxy +" "+ totdis ;
+									return (postion);
+								}
+
+								if (cityX > x && cityY < y){
+									var rise = (y - cityY);
+									var run = (cityX - x);
+									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
+
+									var postion =title +" "+ NQuad +" "+ EQuad +" "+ cityX +" "+ cityY +" "+ distxy + " " + totdis;
+									return (postion);
+								}
+
+								if (cityX < x && cityY > y){
+									var rise = (cityY - y);
+									var run = (x - cityX);
+									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
+
+									var postion =title +" "+ SQuad +" "+ WQuad +" "+ cityX +" "+ cityY +" "+ distxy + " " + totdis;
+									return (postion);
+								}
+
+								if (cityX < x && cityY < y){
+									var rise = (y - cityY);
+									var run = (x - cityX);
+									var distxy = "}Distance coords:(x,y): ("+  run +", "+ rise+")";
+
+									var postion =title +" "+ NQuad +" "+ WQuad  +" "+ cityX +" "+ cityY  +" "+ distxy + " " + totdis;
+									return (postion);
+								}
+
+
+							}
+						},
+//						************************************************************************************************************************************************************************************************************
+//						End Just for fun
+//						***********************************************************************************************************************************************************************************************************						
 
 
 
-/*						
+						/*
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                                The Defense Function
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -802,7 +873,7 @@
 							var defLvl = city.get_LvlDefense();
 							var offLvl = city.get_LvlOffense();
 							//var offensehealth = city.get_CityUnitsData().GetTotalOffenseUnitHealth();
-							//console.log(_this.totalRepairTime(airRT, vehRT, infRT), infRT);
+							//console.log(totalRT, infRT);
 							var cryMax = city.GetResourceMaxStorage(ClientLib.Base.EResourceType.Crystal);
 							var tibMax = city.GetResourceMaxStorage(ClientLib.Base.EResourceType.Tiberium);
 							var powMax = city.GetResourceMaxStorage(ClientLib.Base.EResourceType.Power);
@@ -831,7 +902,7 @@
 							var creditPacGain = (creditPac+1)/(creditCont+1);
 							var creditContGain = (creditCont+1)/(creditPac+1);
 							//console.log(baseName + " creditContGain " +  creditContGain + " creditPacGain " +  creditPacGain +" creditContGain * _this.z "+ creditContGain * _this.z +" creditPacGain * _this.z "+ creditPacGain * _this.z);
-							//console.log(baseName, airRT, vehRT, infRT, _this.totalRepairTime(airRT, vehRT, infRT));
+							//console.log(baseName, airRT, vehRT, infRT, totalRT);
 
 							var refarr = new Array();
 							var refnum = 0;
@@ -1453,7 +1524,7 @@ Upgrade decisions
 							}
 							//	  */
 
-							if( (Ref_obj != undefined) && (refarr.toString() != "") && (maxarr[0] == refarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||( building.get_CurrentLevel() > 2)*/
+							if( (Ref_obj != undefined) && (refarr.toString() != "") && (maxarr[0] == refarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(totalRT < 14400)||( building.get_CurrentLevel() > 2)*/
 								console.log(Ref_obj, refarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Ref_obj, null, null, true);
 								Ref_obj = {};
@@ -1461,7 +1532,7 @@ Upgrade decisions
 								maxarr = [];
 								break; }
 
-							if(  (Pow_obj != undefined)&& (powarr.toString() != "") && (maxarr[0] == powarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if(  (Pow_obj != undefined)&& (powarr.toString() != "") && (maxarr[0] == powarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(totalRT < 14400)||*/
 								console.log(Pow_obj, powarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Pow_obj, null, null, true);
 								Pow_obj = {};
@@ -1470,7 +1541,7 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Har_obj != undefined)&& (hararr.toString()!= "") && (maxarr[0] == hararr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if( (Har_obj != undefined)&& (hararr.toString()!= "") && (maxarr[0] == hararr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(totalRT < 14400)||*/
 								console.log(Har_obj, hararr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Har_obj, null, null, true);
 								Har_obj = {};
@@ -1479,7 +1550,7 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Har1_obj != undefined)&& (hararr1.toString() != "") && (maxarr[0] == hararr1[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if( (Har1_obj != undefined)&& (hararr1.toString() != "") && (maxarr[0] == hararr1[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(totalRT < 14400)||*/
 								console.log(Har1_obj, hararr1, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Har1_obj, null, null, true);
 								Har1_obj = {};
@@ -1488,7 +1559,7 @@ Upgrade decisions
 								break;
 							}
 
-							if( (Acc_obj != undefined)&& (accarr.toString() != "") && (maxarr[0] == accarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if( (Acc_obj != undefined)&& (accarr.toString() != "") && (maxarr[0] == accarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(totalRT < 14400)||*/
 								console.log(Acc_obj, accarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Acc_obj, null, null, true);
 								Acc_obj = {};
@@ -1497,7 +1568,7 @@ Upgrade decisions
 								break;
 							}
 
-							if((Sil_obj != undefined)&& (silarr.toString() != "") && (maxarr[0] == silarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(_this.totalRepairTime(airRT, vehRT, infRT) < 14400)||*/
+							if((Sil_obj != undefined)&& (silarr.toString() != "") && (maxarr[0] == silarr[0]) && (((totalRT < 14400) && (_this.ResOnly == 0))||(_this.ResOnly == 1))){/*(totalRT < 14400)||*/
 								console.log(Sil_obj, silarr, _this.ResOnly);
 								ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Sil_obj, null, null, true);
 								Sil_obj = {};
