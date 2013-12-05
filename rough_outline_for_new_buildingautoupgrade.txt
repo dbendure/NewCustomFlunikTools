@@ -1,6 +1,24 @@
+city (){//not sure if this would work
+	for(var nCity in ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d){
+		var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d[nCity];
+		return city;
+	}
+}
+building(){//not sure if this would work
+	var buildings = this.city.get_Buildings();
+	for (var nBuildings in buildings.d) {
+		var building = buildings.d[nBuildings];
+		return building;
+	}
+}
+Complicated_logic(modType, linkType){
+	if(modType == && linkType){
+		
+	}
+}
 BuildingautoUpgrade() {
-    foreach (city) {
-        foreach (building) {
+    foreach (this.city) { //here you could use "this.city[city_id]" since city_id is really what nCity is. 
+        foreach (this.building) {//here you could use "this.building[building_id]" since building_id is really what nBuildings is.
             switch (tech) {
             case Factory:
             case Barracks:
@@ -27,21 +45,21 @@ BuildingautoUpgrade() {
                 if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated logic
+                    // Complicated_logic(modType, linkType)
                 }
                 break;
             case Harvester:
                 if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated logic
+                    // Complicated_logic(modType, linkType)
                 }
                 break;
             case PowerPlant:
                 if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated logic
+                    // Complicated_logic(building_ID, modType, linkType)
                 }
                 break;
             }
