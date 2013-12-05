@@ -11,10 +11,30 @@ building(){//not sure if this would work
 		return building;
 	}
 }
-Complicated_logic(modType, linkType){
-	if(modType == && linkType){
-		
+Complicated_logic(building_ID, modType, linkType){
+	if(modType == ){
+		switch(modType){
+			case CreditsProduction:
+			case CreditsPackageSize:
+			case CreditsBonusTimeToComplete:
+		}
 	}
+
+	if(linkType == ){
+		switch(linkType){
+			case PowerplantCreditBonus:
+			case TiberiumCreditProduction:
+			case 
+		}
+	}
+}
+upgradeBuilding(obj){
+	if(obj = unit_obj){
+		var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UnitUpgrade", obj, null, null, true);
+	}else{
+		var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", building_obj, null, null, true);
+	}
+	return 	upgrade;
 }
 BuildingautoUpgrade() {
     foreach (this.city) { //here you could use "this.city[city_id]" since city_id is really what nCity is. 
@@ -45,14 +65,14 @@ BuildingautoUpgrade() {
                 if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated_logic(modType, linkType)
+                    // Complicated_logic(building_ID, modType, linkType)
                 }
                 break;
             case Harvester:
                 if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated_logic(modType, linkType)
+                    // Complicated_logic(building_ID, modType, linkType)
                 }
                 break;
             case PowerPlant:
