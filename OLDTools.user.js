@@ -215,28 +215,28 @@
 				                                            case ClientLib.Base.ETechName.Defense_Facility:
 				                                                if (buildinglvl <= (defLvl + 3)) break;
 				                                            case ClientLib.Base.ETechName.Command_Center:
-																if(building.get_CurrentLevel() <= offLvl)break;
+										if(building.get_CurrentLevel() <= offLvl)break;
 				                                            case ClientLib.Base.ETechName.Defense_HQ:
 				                                                if (buildinglvl <= defLvl) break;
 				                                            case ClientLib.Base.ETechName.Construction_Yard:
 				                                                if (buildinglvl <= baseLvl) break;
 																
 				                                            case ClientLib.Base.ETechName.Harvester:
-																if (buildinglvl >= 2) 
-																break;
+										if (buildinglvl >= 2) 
+										break;
 																
 				                                            case ClientLib.Base.ETechName.Refinery:
-															if (buildinglvl >= 2) 
-																break;
+										if (buildinglvl >= 2) 
+											break;
 				                                            case ClientLib.Base.ETechName.PowerPlant:
-															if (buildinglvl >= 2) 
-																break;
+										if (buildinglvl >= 2) 
+											break;
 				                                            case ClientLib.Base.ETechName.Accumulator:
-															if (buildinglvl >= 2) 
-																break;
+										if (buildinglvl >= 2) 
+											break;
 				                                            case ClientLib.Base.ETechName.Silo:
-															if (buildinglvl >= 2) 
-																break;
+										if (buildinglvl >= 2) 
+											break;
 				                                            case ClientLib.Base.ETechName.Support_Air:
 				                                            case ClientLib.Base.ETechName.Support_Ion:
 				                                            case ClientLib.Base.ETechName.Support_Art:
