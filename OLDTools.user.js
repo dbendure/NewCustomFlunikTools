@@ -109,7 +109,6 @@
                                                     return true;
                                                 },
 
-<<<<<<< HEAD
 
                                                 getMainProductionBuildingMdbId: function (placementType, faction) {
                                                         var mdbId = -1;
@@ -462,133 +461,6 @@
                                         fn = Function('', strFunction);
                                         ClientLib.Data.CityUnits.prototype.get_DefenseUnits = fn;
                                         console.log("ClientLib.Data.CityUnits.prototype.get_DefenseUnits = function(){var $createHelper;return this." + fn_name + ";}");
-=======
-						canUpgradeBuilding: function (building, city) {
-							var nextLevel = (building.get_CurrentLevel() + 1);
-							var gameDataTech = building.get_TechGameData_Obj();
-							var hasEnoughResources = city.HasEnoughResources(ClientLib.Base.Util.GetTechLevelResourceRequirements_Obj(nextLevel, gameDataTech));
-							return (!building.get_IsDamaged() && !city.get_IsLocked() && hasEnoughResources);
-						},
-                        
-						Building_Object: function(city, building){
-							if(city != null && building != null){
-							var building_obj = {
-											base_name: city.m_SupportDedicatedBaseName,
-											building_name: building.get_UnitGameData_Obj().dn,
-											cityid: city.get_Id(),
-											posX: building.get_CoordX(),
-											posY: building.get_CoordY(),
-											isPaid: true
-										}
-							return building_obj;
-							
-							}
-						},
-						
-						upgradeBuilding: function(obj){
-							if(obj == unit_obj){
-								var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UnitUpgrade", obj, null, null, true);
-							}else{
-								var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", obj, null, null, true);
-							}
-							return 	upgrade;
-						},
-						autoUpgrade : function() {
-							for (var nCity in ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d)
-							{
-								var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d[nCity];
-								var buildings = city.get_Buildings();
-								var airRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Aircraft, false);
-								var vehRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Vehicle, false);
-								var infRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Infantry, false);
-                                				var maxRT = Math.max(airRT, vehRT, infRT);
-								
-								for (var nBuildings in buildings.d) {
-									var building = buildings.d[nBuildings];
-									if(!this.canUpgradeBuilding(building, city))continue;
-									var tech = building.get_TechName();
-									var name = building.get_UnitGameData_Obj().dn;
-									var baseLvl = city.get_LvlBase();
-									var defLvl = city.get_LvlDefense();
-									var offLvl = city.get_LvlOffense();
-									var building_Id = building.get_Id();
-									
-									
-									
-									switch (tech) {
-				                                            case ClientLib.Base.ETechName.Factory:if(maxRT == vehRT)break;
-				                                            case ClientLib.Base.ETechName.Barracks:if(maxRT == infRT)break;
-				                                            case ClientLib.Base.ETechName.Airport:if(maxRT == airRT)break;
-																
-				                                            case ClientLib.Base.ETechName.Defense_Facility:
-				                                                if (buildinglvl <= (defLvl + 3)) break;
-				                                            case ClientLib.Base.ETechName.Command_Center:
-										if(building.get_CurrentLevel() <= offLvl)break;
-				                                            case ClientLib.Base.ETechName.Defense_HQ:
-				                                                if (buildinglvl <= defLvl) break;
-				                                            case ClientLib.Base.ETechName.Construction_Yard:
-				                                                if (buildinglvl <= baseLvl) break;
-																
-				                                            case ClientLib.Base.ETechName.Harvester:
-										if (buildinglvl >= 2) 
-										break;
-																
-				                                            case ClientLib.Base.ETechName.Refinery:
-										if (buildinglvl >= 2) 
-											break;
-				                                            case ClientLib.Base.ETechName.PowerPlant:
-										if (buildinglvl >= 2) 
-											break;
-				                                            case ClientLib.Base.ETechName.Accumulator:
-										if (buildinglvl >= 2) 
-											break;
-				                                            case ClientLib.Base.ETechName.Silo:
-										if (buildinglvl >= 2) 
-											break;
-				                                            case ClientLib.Base.ETechName.Support_Air:
-				                                            case ClientLib.Base.ETechName.Support_Ion:
-				                                            case ClientLib.Base.ETechName.Support_Art:
-				                                               if (buildinglvl >= defLvl) break;
-				                                        }
-										
-										console.log(this.Building_Object(city, building));
-											//ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", building_obj, null, null, true);
-										//}
-										
-										
-									//}
-									
-								}
-							  
-								
-							}
-						}
-					}
-				});
-			}
-		} catch (e) {
-			console.log("createFlunikTools: ", e);
-		}
-		
-		function FlunikTools_checkIfLoaded() {
-			try {
-				if (typeof qx != 'undefined' && qx.core.Init.getApplication() && qx.core.Init.getApplication().getUIItem(ClientLib.Data.Missions.PATH.BAR_NAVIGATION) && qx.core.Init.getApplication().getUIItem(ClientLib.Data.Missions.PATH.BAR_NAVIGATION).isVisible()) {
-					createFlunikTools();
-					if (typeof ClientLib.API.Util.GetUnitMaxHealth == 'undefined'){
-						for (var key in ClientLib.Base.Util)
-						{
-							var strFunction = ClientLib.Base.Util[key].toString();
-							if ((strFunction.indexOf("function (a,b,c)") == 0 || strFunction.indexOf("function (a,b)") == 0) &&
-									strFunction.indexOf("*=1.1") > -1)
-							{
-								FlunikTools.Main.getInstance().GetUnitMaxHealth = ClientLib.Base.Util[key];
-								console.log("FlunikTools.Main.getInstance().GetUnitMaxHealth = ClientLib.Base.Util["+key+"]");
-								break;
-							}
-						}
-					}else{
-						FlunikTools.Main.getInstance().GetUnitMaxHealth = ClientLib.API.Util.GetUnitMaxHealth;	
->>>>>>> 8b34539abea582b3c2c223c68d8f7592f60ae8cc
 
 
 
@@ -621,18 +493,3 @@
         }
 })();
 
-<<<<<<< HEAD
-=======
-	try
-	{
-		var FlunikScript = document.createElement("script");
-		FlunikScript.innerHTML = "(" + FlunikTools_main.toString() + ")();";
-		FlunikScript.type = "text/javascript";
-		if (/commandandconquer\.com/i.test(document.domain)) {
-			document.getElementsByTagName("head")[0].appendChild(FlunikScript);
-		}
-	} catch (e) {
-		console.log("FlunikTools: init error: ", e);
-	}
-})();
->>>>>>> 8b34539abea582b3c2c223c68d8f7592f60ae8cc
