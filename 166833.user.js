@@ -34,7 +34,7 @@
 						AautoUpdateHandle : null,
 						p : 1,
 						f : 1,
-						g : 0,
+						PowerOrTib : 0,
 						h : 1,
 						r : 1,
 						s : 1,
@@ -248,8 +248,8 @@
 									//BuildingsButton.setLabel("B.Hold");
 									_this.y = 1;
 									_this.z = 0.293;
-									_this.g = 0;
-									console.log("_this.y "+_this.y + " _this.z " +_this.z +" new world mode" + "_this.g" + _this.g + "tibcost");
+									_this.PowerOrTib = 0;
+									console.log("_this.y "+_this.y + " _this.z " +_this.z +" new world mode" + "_this.PowerOrTib" + _this.PowerOrTib + "tibcost");
 									//alert("Stopped auto-update");
 								} else {
 									window.FlunikTools.Main.getInstance().OnFunction();
@@ -258,8 +258,8 @@
 									//alert("Stop auto-update to return value to 0");
 									_this.y = 0.293;
 									_this.z = 1;
-									_this.g=1;
-									console.log("_this.y "+_this.y + " _this.z " +_this.z +  " old world mode"+ "_this.g" + _this.g + "powcost");
+									_this.PowerOrTib=1;
+									console.log("_this.y "+_this.y + " _this.z " +_this.z +  " old world mode"+ "_this.PowerOrTib" + _this.PowerOrTib + "powcost");
 								}
 							}, this);
 							PowerBuildingChoice.addListener("click", function (e) {
@@ -447,13 +447,13 @@
 							if (gameDataTech == null || unit.get_IsDamaged() || city.get_IsLocked() || !hasEnoughResources) {
 								return false;
 							}
-							var id = _this.getMainProductionBuildingMdbId(gameDataTech.pt, gameDataTech.f);
+							var id = _this.PowerOrTibetMainProductionBuildingMdbId(gameDataTech.pt, gameDataTech.f);
 							var building = city.get_CityBuildingsData().GetBuildingByMDBId(id);
 							if ((building == null) || (building.get_CurrentDamage() > 0)) {
 								return false;
 							}
 							var levelReq = ClientLib.Base.Util.GetUnitLevelRequirements_Obj(nextLevel, gameDataTech);
-							var reqTechIndexes = _this.getMissingTechIndexesFromTechLevelRequirement(levelReq, true, city);
+							var reqTechIndexes = _this.PowerOrTibetMissingTechIndexesFromTechLevelRequirement(levelReq, true, city);
 							if ((reqTechIndexes != null) && (reqTechIndexes.length > 0)) {
 								return false;
 							}
@@ -648,7 +648,182 @@
 //						************************************************************************************************************************************************************************************************************
 //						End Just for fun
 //						***********************************************************************************************************************************************************************************************************						
+						Mod_And_Link_Type : function (city, building_ID, modType, linkType){//not 100% on if this idea would work, we may need a separate function to do the math, or do the math in the for loop.
+							if(modType !== null ){
+							//for(var modType in this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d){
+								var Prodution = city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType];
+								
+								
+								return Production.TotalValue;
+							}
+							if(linkType !== null ){
+							//for(var linkType in this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d){
+								var LinkType = city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].ConnectedLinkTypes.d[linkType];
+								return LinkType.Value;
+							}
 
+						},
+						Mod_And_Link_Type : function (city, building_ID, modType, linkType){//not 100% on if this idea would work, we may need a separate function to do the math, or do the math in the for loop.
+							//console.log( city, building_ID, modType, linkType );
+							if(linkType != null ){
+								var LinkType0 = city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].ConnectedLinkTypes.d[linkType].Value;
+								return (LinkType0);
+							//console.log( LinkType0 );
+							}else{
+								var LinkType1 = city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].TotalValue;
+								return (LinkType1);
+							//console.log( LinkType1 );
+							}
+							
+
+						},
+						Production_Math : function (city, building_ID, _atype){
+							//refineries, power plants, and harvesters
+								//console.log( city, building_ID, _atype);
+								var btype = _atype;
+								if(btype == ClientLib.Base.ETechName.Refinery){ 
+										if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsProduction, null) != undefined ){
+											var mods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsProduction, null);
+										}else{
+											var mods = 0;
+										}
+										if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsPackageSize, null) != undefined ){
+											var pacMods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsPackageSize, null);
+										}else{
+											var pacMods = 0;
+										}
+										if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsBonusTimeToComplete, null) != undefined){
+											var pacMods1 =this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsBonusTimeToComplete, null);
+									    }else{
+											var pacMods1 = 0;
+										}
+									   if(city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerplantCreditBonus] != undefined){ 
+											var Ltype1 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsProduction, ClientLib.Base.ELinkType.PowerplantCreditBonus);
+									   }else{
+										var Ltype1 = 0;
+										}
+									   if( city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.TiberiumCreditProduction] != undefined){
+											var Ltype2 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CreditsProduction, ClientLib.Base.ELinkType.TiberiumCreditProduction);
+									   }else{
+										var Ltype2 = 0;
+										}
+									   
+									   
+									   var proofLevel12 = (605 + (7260/6) + 484 + 605);
+									   var	Total_Production =  (mods + (pacMods /(pacMods1/3600)) + Ltype1 + Ltype2) / proofLevel12;
+								}
+								
+								if(btype == ClientLib.Base.ETechName.PowerPlant){ 
+										if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerProduction, null) != undefined ){
+											var mods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerProduction, null);
+										}else{
+											var mods = 0;
+										}
+										if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerPackageSize, null) != undefined ){
+											var pacMods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerPackageSize, null);
+										}else{
+											var pacMods = 0;
+										}
+										if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerBonusTimeToComplete, null) != undefined){
+											var pacMods1 =this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerBonusTimeToComplete, null);
+									    }else{
+											var pacMods1 = 0;
+										}
+									   if(city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.AccumulatorPowerBonus] != undefined){ 
+											var Ltype1 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.AccumulatorPowerBonus);
+									   }else{
+										var Ltype1 = 0;
+										}
+									   if( city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.CrystalCreditProduction] != undefined){
+											var Ltype2 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.CrystalCreditProduction);
+									   }else{
+										var Ltype2 = 0;
+										}
+									   if (city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.RefineryPowerBonus] != undefined ){
+											var Ltype3 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.RefineryPowerBonus);
+									   }else{
+										var Ltype3 = 0;
+										}
+									   
+									   var proofLevel12 = (605+(7260/6)+570+456+484);
+									   var	Total_Production =  (mods + (pacMods /(pacMods1/3600)) + Ltype1 + Ltype2 + Ltype3) / proofLevel12;
+								}/*
+								if(btype == "green_har"){ 
+									var	Total_Production = (
+									  
+									   if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumProduction, null) != undefined || this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumPackageSize, null) != undefined || this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete, null) != undefined){
+											var mods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumProduction, null);
+											var pacMods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumPackageSize, null);
+											var pacMods1 =this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete, null);
+									    }else{
+											var mods = 0;
+											var pacMods = 0;
+											var pacMods1 = 0;
+										}
+									   if(city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloTiberiumProduction] != undefined){ 
+											var Ltype1 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumProduction, ClientLib.Base.ELinkType.SiloTiberiumProduction);
+									   }else{
+										var Ltype1 = 0;
+										}
+									   var proofLevel12 = (570 + (7260/6) + 380);
+									   var	Total_Production =  (mods + (pacMods /(pacMods1/3600)) + Ltype1 ) / proofLevel12;
+								}
+								if(btype == "blue_har"){ 
+									
+									   
+									   if(this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalProduction, null) != undefined || this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalPackageSize, null) != undefined || this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalBonusTimeToComplete, null) != undefined){
+											var mods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalProduction, null);
+											var pacMods = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalPackageSize, null);
+											var pacMods1 =this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalBonusTimeToComplete, null);
+									    }else{
+											var mods = 0;
+											var pacMods = 0;
+											var pacMods1 = 0;
+										}
+									   if(city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloCrystalProduction] != undefined){ 
+											var Ltype1 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalProduction, ClientLib.Base.ELinkType.SiloCrystalProduction);
+									   }else{
+										var Ltype1 = 0;
+										}
+									   
+									   
+									   
+									   var proofLevel12 = (570 + (7260/6) + 380);
+									   var	Total_Production =  (mods + (pacMods /(pacMods1/3600)) + Ltype1 ) / proofLevel12;
+								}
+							//silos  and accumulators
+								if(btype == "sil"){
+									if(city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterCrystalProduction] != undefined){ 
+											var Ltype1 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.CrystalProduction, ClientLib.Base.ELinkType.HarvesterCrystalProduction);
+									   }else{
+										var Ltype1 = 0;
+										}
+									   if( city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterTiberiumProduction] != undefined){
+											var Ltype2 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.TiberiumProduction, ClientLib.Base.ELinkType.HarvesterTiberiumProduction);
+									   }else{
+										var Ltype2 = 0;
+										}
+									   
+									   
+									   var proofLevel12 = (380 + 380);
+									   var	Total_Production =  (Ltype1 + Ltype2) / proofLevel12;
+								}
+								if(btype == "acc"){
+									
+									   if(city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerPlantAccumulatorBonus] != undefined){ 
+											var Ltype1 = this.Mod_And_Link_Type(city, building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.PowerPlantAccumulatorBonus);
+									   }else{
+										var Ltype1 = 0;
+										}
+									   var proofLevel12 = (456) ;
+									   var	Total_Production =  (Ltype1) / proofLevel12;
+									   
+								}*/
+								if(Total_Production != NaN){
+							console.log("Total_Pro: "+Total_Production);
+							return (Total_Production);
+							}
+						},
 
 
 						/*
@@ -682,7 +857,7 @@
 							for (var nUnit in defenceUnits.d ) 
 							{defnum++
 								var unit = defenceUnits.d[nUnit];
-							//console.log(_this.GetUnitMaxHealth(unit.get_CurrentLevel(), unit.get_MdbUnitId (), false));
+							//console.log(_this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), unit.get_MdbUnitId (), false));
 							var HQ = new Array ();
 							for(var nBuildings in buildings.d){
 								var building = buildings.d[nBuildings];
@@ -700,10 +875,10 @@
 							//console.log(HQ[0]);
 
 							if(unit.get_CurrentLevel() > 3){
-								var unitHealthperCost = _this.GetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[1].Count);
+								var unitHealthperCost = _this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[1].Count);
 							}
 							if(unit.get_CurrentLevel() <= 3){
-								var unitHealthperCost = Math.pow( (_this.GetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[0].Count)), -1);
+								var unitHealthperCost = Math.pow( (_this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[0].Count)), -1);
 							}
 							defarr[defnum] =  unitHealthperCost;
 							defarr.sort(function(a,b){return b-a});
@@ -736,8 +911,8 @@
 										unitId: unit.get_Id()
 								}
 							}
-							/*if(_this.GetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false).toString() !== "NaN"){
-									console.log(_this.GetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false));
+							/*if(_this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false).toString() !== "NaN"){
+									console.log(_this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false));
 									}*/
 							}
 							if ( (defunit_obj != undefined)&&(defunit_obj.Ratio == defarr[0]) && (defunit_obj.level <= (HQ[0]-1) )) {
@@ -791,10 +966,10 @@
 							var unitlvlup1 = unit.get_CurrentLevel() + 1;
 							var name  = unit.get_UnitGameData_Obj().dn;
 							if(unit.get_CurrentLevel() > 2){
-								var unitHealthperCost = _this.GetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[1].Count);
+								var unitHealthperCost = _this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[1].Count);
 							}
 							if(unit.get_CurrentLevel() <= 2){
-								var unitHealthperCost = Math.pow( (_this.GetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[0].Count)), -1);
+								var unitHealthperCost = Math.pow( (_this.PowerOrTibetUnitMaxHealth(unit.get_CurrentLevel(), ClientLib.Res.ResMain.GetInstance().GetUnit_Obj(unit.get_MdbUnitId()), false)/(ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(unitlvlup1, unit.get_UnitGameData_Obj())[0].Count)), -1);
 							}
 							offarr[offnum] =  unitHealthperCost;
 							//What this does is sort the array from highest to lowest, then it dumps the first ratio with the .shift(), and upgrades the next best thing. 
@@ -924,7 +1099,7 @@
 								if(!_this.canUpgradeBuilding(building, city))continue;
 								var name = building.get_UnitGameData_Obj().dn;
 								var buildinglvlup1 = building.get_CurrentLevel() + 1;
-								var bulid = building.get_Id();
+								var building_ID = building.get_Id();
 								var tech = building.get_TechName();
 
 								//var buildTibCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[0].Count;
@@ -1121,38 +1296,12 @@ Upgrade Resource Defining
 
 								if ((tech == ClientLib.Base.ETechName.Refinery    &&  building.get_CurrentLevel() > 2) && (_this.r == 1)){
 									var ref = building;
+									var a = "ref";
 									refnum++;
-									//var refObj = Object();CreditsBonusTimeToComplete
-									//if(refnum = 0)break;
-									//console.log(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[30].ConnectedLinkTypes.d[36].ProvidingToValue, city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[30].ConnectedLinkTypes.d[37].ProvidingToValue );
-									//OwnProdModifiers.d[30].ConnectedLinkTypes.d[36].Value         OwnProdModifiers.d[30].ConnectedLinkTypes.d[37].Value   
-
-									var refPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].TotalValue;
-									//var refLinkTypes = (city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerplantCreditBonus].Value) + (city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.TiberiumCreditProduction].Value);
-									var refPac = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsPackageSize].TotalValue;
-									var refPacperH = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsBonusTimeToComplete].TotalValue;
-									var refCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[_this.g].Count;
-									var refLinkTypes0 = 0;
-									var refLinkTypes1 = 0;
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[36] != undefined){
-										refLinkTypes0 = (city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerplantCreditBonus].Value);
-										//var refTotalPro = refPro + (refPac/(refPacperH/3600)) +  refLinkTypes0 ;
-									}else {refLinkTypes0 = 0;}
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[37] != undefined){
-										refLinkTypes1 = (city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CreditsProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.TiberiumCreditProduction].Value);
-										//var refTotalPro = refPro + (refPac/(refPacperH/3600)) +  refLinkTypes0 +  refLinkTypes1  ;
-									}else {refLinkTypes1 = 0;}
-
-									var refTotalPro = refPro + (refPac/(refPacperH/3600)) +  refLinkTypes0 +  refLinkTypes1  ;
-
-									var refTotalProOfLevel12 = 605 + (7260/6) + 484 + 605; 
-									var refProRatio = Math.pow( ((refTotalProOfLevel12/31608)*100)/((refTotalPro/refCost)*100), -1);
+									var refProRatio = this.Production_Math(building_ID, a);
 									refarr[refnum] = refProRatio;
-									// refarr[refid] = Ref;
-									if ((refProRatio > 0) ){/* Math.floor((Math.random()*10)+1)){*/
-										//console.log(((refTotalProOfLevel12/96000)*100)/((refTotalPro/refCost)*100) );
+									
+									if ((refProRatio > 0) ){
 										refarr.sort(function(a,b){return b-a});
 
 
@@ -1174,52 +1323,13 @@ Upgrade Resource Defining
 								}
 								if ((tech == ClientLib.Base.ETechName.PowerPlant) && (building.get_CurrentLevel() > 2) &&(_this.p == 1)){
 									var pow = building;
+									var a = "p_p";
 									pownum++;
-									//var refObj = Object();CreditsBonusTimeToComplete
-
-									//OwnProdModifiers.d[6].ConnectedLinkTypes.d[29].Value - OwnProdModifiers.d[6].ConnectedLinkTypes.d[38].Value - OwnProdModifiers.d[30].ConnectedLinkTypes.d[42].Value
-
-									var powPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].TotalValue;
-									var powPac = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerPackageSize].TotalValue;
-									var powPacperH = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerBonusTimeToComplete].TotalValue;
-									var powCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[_this.g].Count;
-									var powLinkTypes0 = 0;
-									var powLinkTypes1 = 0;
-									var powLinkTypes2 = 0;
-									var powTotalProOfLevel12 = 605 + (7260/6) + 570 + 456 + 484; 
-
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[29] != undefined ){
-										powLinkTypes0 = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.AccumulatorPowerBonus].Value ;											
-										var powLinkTypes1 = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.CrystalCreditProduction].Value ;
-										//var powTotalPro = powPro + (powPac/(powPacperH/3600)) + powLinkTypes0 +  powLinkTypes1 + powLinkTypes2 ;
-										//var powTotalProOfLevel12 = 605 + (7260/6) + 570 + 456 + 484;
-										//console.log(powLinkTypes0);
-									}else{var powLinkTypes0 = 0;}
-
-									if( city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[38] != undefined ){
-										powLinkTypes1 = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.CrystalCreditProduction].Value ;
-										//var powTotalPro = powPro + (powPac/(powPacperH/3600)) + powLinkTypes0 +  powLinkTypes1 + powLinkTypes2 ;
-										//var powTotalProOfLevel12 = 605 + (7260/6) + 570 + 456 + 484; 
-										//console.log(powLinkTypes1);
-									}else{var powLinkTypes1 = 0;}
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[42] != undefined){
-										powLinkTypes2 = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.RefineryPowerBonus].Value;
-										//var powTotalPro = powPro + (powPac/(powPacperH/3600)) + powLinkTypes0 +  powLinkTypes1 + powLinkTypes2 ;
-										//var powTotalProOfLevel12 = 605 + (7260/6) + 570 + 456 + 484; 
-										//console.log(powLinkTypes2);
-									}else{var powLinkTypes2 = 0;}
-
-
-									var powTotalPro = powPro + (powPac/(powPacperH/3600)) + powLinkTypes0 +  powLinkTypes1 + powLinkTypes2 ;
-
-									//var powTotalProOfLevel12 = 605 + (7260/6) + 570 + 456 + 484; 
-									var powProRatio = Math.pow( ((powTotalProOfLevel12/164736)*100)/((powTotalPro/powCost)*100), -1);
+									
+									var powProRatio = this.Production_Math(building_ID, a);
 									powarr[pownum] = powProRatio;
 
-									if ((powProRatio > 0) ){/* Math.floor((Math.random()*10)+1)){*/
-										// console.log(((powTotalProOfLevel12/96000)*100)/((powTotalPro/refCost)*100) );
+									if ((powProRatio > 0) ){
 										powarr.sort(function(a,b){return b-a});
 
 
@@ -1242,33 +1352,9 @@ Upgrade Resource Defining
 								if ((tech == ClientLib.Base.ETechName.Harvester   &&  building.get_CurrentLevel() > 2) && (_this.h == 1)){
 									var harv = building;
 									harnum++;   harnum1++;
-
-									var hartibLinkTypes = 0;
-									var harcryLinkTypes = 0;
-									//OwnProdModifiers.d[1].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloTiberiumProduction].Value - 
-
 									if((city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[1,25,33])
-									){//console.log(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[1,25,33]);&& (powPacGain > tibPacGain)&& (powPacGain > cryPacGain)
-
-										var hartibPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].TotalValue;
-										//var hartibLinkTypes = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloTiberiumProduction].Value;
-										var hartibPac = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumPackageSize].TotalValue;
-										var hartibPacperH = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete].TotalValue;
-
-										if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloTiberiumProduction] != undefined){
-											hartibLinkTypes = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloTiberiumProduction].Value;
-											//var harTibTotalPro = hartibPro + (hartibPac/(hartibPacperH/3600)) + hartibLinkTypes;
-										}else{hartibLinkTypes = 0;}
-
-										var harTibTotalPro = hartibPro + (hartibPac/(hartibPacperH/3600)) + hartibLinkTypes;
-										var harCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[_this.g].Count;
-
-										//var harTibTotalPro = hartibPro + (hartibPac/(hartibPacperH/3600)) ;
-										var harTibTotalProOfLevel12 = 570 + (7260/6) + 380; 
-										var harTibProRatio = Math.pow( ((harTibTotalProOfLevel12/95040)*100)/((harTibTotalPro/harCost)*100), -1);
-
-
-
+									){var a = "green_har";
+										var harTibProRatio = this.Production_Math(building_ID, a);
 										hararr[harnum] = harTibProRatio;
 
 
@@ -1294,30 +1380,9 @@ Upgrade Resource Defining
 
 										}
 									}
-									if((city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[4,26,34])){
-										//console.log(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[4,26,34]);
-
-										//var refObj = Object();CreditsBonusTimeToComplete
-
-
-
-
-
-										var harcryPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].TotalValue;
-										//var harcryLinkTypes =  city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloCrystalProduction].Value;
-										var harcryPac = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalPackageSize].TotalValue;
-										var harcryPacperH = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalBonusTimeToComplete].TotalValue;
-
-										var harCryCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[_this.g].Count;
-
-										if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloCrystalProduction] != undefined){
-											harcryLinkTypes = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.SiloCrystalProduction].Value;
-											//var harCryTotalPro = harcryPro + (harcryPac/(harcryPacperH/3600)) + harcryLinkTypes;
-										}else{var harcryLinkTypes = 0;}
-
-										var harCryTotalPro = harcryPro + (harcryPac/(harcryPacperH/3600)) + harcryLinkTypes;
-										var harCryTotalProOfLevel12 = 570 + (7260/6) + 380; 
-										var harCryProRatio = Math.pow( ((harCryTotalProOfLevel12/95040)*100)/((harCryTotalPro/harCryCost)*100), -1);
+									if((city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[4,26,34])){
+										var a = "blue_har";
+										var harCryProRatio = this.Production_Math(building_ID, a);
 
 
 										hararr1[harnum1] = harCryProRatio;
@@ -1349,25 +1414,11 @@ Upgrade Resource Defining
 								}
 								if((tech == ClientLib.Base.ETechName.Accumulator) && (building.get_CurrentLevel() > 2) && (_this.a == 1)){
 									var acc = building;
+									var a = "acc";
+									
 									accnum++;
-									//var refObj = Object();CreditsBonusTimeToComplete
-
-									var accLinkTypes = 0;
-									//OwnProdModifiers.d[6].ConnectedLinkTypes.d[41].Value
-
-									var accPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].TotalValue;
-									//var accLinkTypes = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerPlantAccumulatorBonus].Value;
-									var accSto = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerStorage].TotalValue;
-									var accCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[_this.g].Count;
-									//var accTotalPro = accPro ;
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerPlantAccumulatorBonus] != undefined){
-										var accLinkTypes = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.PowerProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.PowerPlantAccumulatorBonus].Value;
-										//var accTotalPro = accLinkTypes;
-									}else{accLinkTypes = 0;}
-									var accTotalPro = accLinkTypes;
-									var accTotalProOfLevel12 = 456 ;
-									var accProRatio = Math.pow( ((accTotalProOfLevel12/63360)*100)/((accTotalPro/accCost)*100), -1);
+									
+									var accProRatio = this.Production_Math(building_ID, a);
 									accarr[accnum] = accProRatio;
 
 									if ((accProRatio > 0) ){/* Math.floor((Math.random()*10)+1)){*/
@@ -1392,39 +1443,10 @@ Upgrade Resource Defining
 								}
 								if((tech == ClientLib.Base.ETechName.Silo)        && (building.get_CurrentLevel() > 2)  && (_this.s == 1) ){
 									var silo = building;
+									var a = "sil";
 									silnum++;
-									// console.log(city.GetBuildingCache(bulid).DetailViewInfo);
-									//OwnProdModifiers.d[1].ConnectedLinkTypes.d[39].Value - OwnProdModifiers.d[4].ConnectedLinkTypes.d[40].Value
-									//console.log(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d);
-									var silCryLinkType = 0;
-									var silTibLinkType = 0;
-									var silTotalPro = 0;
-									var silCryPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].TotalValue;
-									//var silCryLinkType = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterCrystalProduction].Value;
-									var silTibPro = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].TotalValue;
-									//var silTibLinkType = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterTiberiumProduction].Value;
-									var silCrySto = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalStorage].TotalValue;
-									var silTibSto = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumStorage].TotalValue;
-									var silCost = ClientLib.Base.Util.GetUnitLevelResourceRequirements_Obj(buildinglvlup1, building.get_UnitGameData_Obj())[_this.g].Count;
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterCrystalProduction] == undefined ){
-
-										silCryLinkType =  0 ;
-									}else{silCryLinkType = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.CrystalProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterCrystalProduction].Value;
-									//silTotalPro = silCryLinkType + silTibLinkType;
-									}
-
-									if(city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterTiberiumProduction] == undefined ){
-
-										silTibLinkType = 0;
-									}else{silTibLinkType = city.GetBuildingCache(bulid).DetailViewInfo.OwnProdModifiers.d[ClientLib.Base.EModifierType.TiberiumProduction].ConnectedLinkTypes.d[ClientLib.Base.ELinkType.HarvesterTiberiumProduction].Value;
-									//silTotalPro = silCryLinkType + silTibLinkType;
-									}
-
-
-									silTotalPro = silCryLinkType + silTibLinkType;
-									var silTotalProOfLevel12 = 380 + 380 ; 
-									var silProRatio = Math.pow( ((silTotalProOfLevel12/63360)*100)/((silTotalPro/silCost)*100), -1);
+									 
+									var silProRatio = this.Production_Math(building_ID, a);
 
 
 									silarr[silnum] = silProRatio;

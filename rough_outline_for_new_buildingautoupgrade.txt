@@ -15,22 +15,65 @@ building(){//not sure if this would work
 
 Mod_And_Link_Type(building_ID, modType, linkType){//not 100% on if this idea would work, we may need a separate function to do the math, or do the math in the for loop.
 	if(modType !== null ){
-		var Prodution = this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].TotalValue;
-		return Production;
+	//for(var modType in this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d){
+		var Prodution = this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType];
+		
+		
+		return Production.TotalValue;
 	}
 	if(linkType !== null ){
-		var LinkType = this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].ConnectedLinkTypes.d[linkType].Value;
-		return LinkType;
+	//for(var linkType in this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d){
+		var LinkType = this.city.GetBuildingCache(building_ID).DetailViewInfo.OwnProdModifiers.d[modType].ConnectedLinkTypes.d[linkType];
+		return LinkType.Value;
 	}
 
 }
 
-Production_Math(production, packages, package_per_hour, LinkType0, LinkType1, LinkType2){
-	if(packages !== 0 &&  package_per_hour !== 0){//refineries, power plants, and harvesters
-		var Total_Production = production + (packages/(package_per_hour/3600)) +  LinkType0 +  LinkType1 +  LinkType2 ;
-	}else{//silos  and accumulators
-		var Total_Production = production  +  LinkType0 +  LinkType1 +  LinkType2 ;
-	}
+Production_Math(a){
+	//refineries, power plants, and harvesters
+		if(a == "ref"){ 
+			var	Total_Production = (
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CreditsProduction, null) + 
+			  (Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CreditsPackageSize, null)/(Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CreditsBonusTimeToComplete, null)/3600)) + 
+			   Mod_And_Link_Type(building_ID, EModifierType.CreditsProduction, ClientLib.Base.ELinkType.PowerplantCreditBonus) +  
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CreditsProduction, ClientLib.Base.ELinkType.TiberiumCreditProduction)
+			  ) /(605 + (7260/6) + 484 + 605) ;
+		}
+		if(a == "p_p"){ 
+			var	Total_Production = (
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.PowerProduction, null) + 
+			  (Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.PowerPackageSize, null)/(Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.PowerBonusTimeToComplete, null)/3600)) + 
+			   Mod_And_Link_Type(building_ID, EModifierType.PowerProduction, ClientLib.Base.ELinkType.AccumulatorPowerBonus) +  
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.CrystalCreditProduction) +  
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.RefineryPowerBonus)
+			  ) / (605 + (7260/6) + 570 + 456 + 484);
+		}
+		if(a == "green_har"){ 
+			var	Total_Production = (
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.TiberiumProduction, null) + 
+			  (Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.TiberiumPackageSize, null)/(Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete, null)/3600)) + 
+			   Mod_And_Link_Type(building_ID, EModifierType.PowerProduction, ClientLib.Base.ELinkType.SiloTiberiumProduction)  
+			   ) / (570 + (7260/6) + 380) ;
+		}
+		if(a == "blue_har"){ 
+			var	Total_Production = (
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CrystalProduction, null) + 
+			   (Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CrystalPackageSize, null)/(Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CrystalBonusTimeToComplete, null)/3600)) + 
+			   Mod_And_Link_Type(building_ID, EModifierType.CrystalProduction, ClientLib.Base.ELinkType.SiloCrystalProduction)  
+			   ) / (570 + (7260/6) + 380) ;
+		}
+	//silos  and accumulators
+		if(a == "sil"){
+			var	Total_Production = (
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.CrystalProduction, ClientLib.Base.ELinkType.HarvesterCrystalProduction) + 
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.TiberiumProduction, ClientLib.Base.ELinkType.HarvesterTiberiumProduction)  
+			   ) /(380 + 380) ;
+		}
+		if(a == "acc"){
+			var	Total_Production = (
+			   Mod_And_Link_Type(building_ID, ClientLib.Base.EModifierType.PowerProduction, ClientLib.Base.ELinkType.PowerPlantAccumulatorBonus)  
+			   ) / (456) ;
+		}
 	return Total_Production;
 }
 
@@ -44,22 +87,25 @@ Prodution_Of_A_Level_12(a){
 
 
 }
+Production_Ratio(this.Prodution_Math, this.Prodution_Of_A_Level_12){
 
+}
 upgradeBuilding(obj){
 	if(obj = unit_obj){
 		var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UnitUpgrade", obj, null, null, true);
 	}else{
-		var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", building_obj, null, null, true);
+		var upgrade = ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", obj, null, null, true);
 	}
 	return 	upgrade;
 }
 
 BuildingautoUpgrade() {
-	var EModifierType = ClientLib.Base.EModifierType;
-	var ELinkType = ClientLib.Base.ELinkType;
-    foreach (this.city) { //here you could use "this.city[city_id]" since city_id is really what nCity is. 
-        foreach (this.building) {//here you could use "this.building[building_id]" since building_id is really what nBuildings is.
-            switch (tech) {
+	var city = this.city;
+	var building = this.building;
+    foreach (city) { //here you could use "this.city[city_id]" since city_id is really what nCity is. 
+        foreach (building) {//here you could use "this.building[building_id]" since building_id is really what nBuildings is.
+            var type = building.get_CollectResourceType()
+			switch (tech) {
             case Factory:
             case Barracks:
             case Airport:
@@ -83,32 +129,41 @@ BuildingautoUpgrade() {
                 break;
             case Refinery: // TODO: Can all these production buildings be combined into a single set of logic?
                 var a = "ref";
+				//ClientLib.Base.Resource.IsResourceProductionType (ClientLib.Base.EResourceType _resType)
 				if (building_level <= 2) {
                     // upgrade it
                 } else {
                     // Complicated_logic: 
 					//	
 					//Mod_And_Link_Type(building_ID, modType, linkType) ---- var packages = Mod_And_Link_Type(building_ID, EModifierType.CreditsPackageSize, null) ------ var linktypes = Mod_And_Link_Type(building_ID, EModifierType.CreditsProduction, ELinkType.PowerplantCreditBonus)
-					//Production_Math(production, packages, package_per_hour, LinkType0, LinkType1, LinkType2) ------ var prodution_total = Production_Math(production, packages, package_per_hour, LinkType0, LinkType1, 0);
-					//var level12_Prodution = Prodution_Of_A_Level_12(a);
-					//var prodution_ratio =(prodution_total/Cost)/(level12_Prodution/Cost_of_level_12);
+					//Production_Math(a) ------ var prodution_ratio = Production_Math(a);
 					//^^^^prodution_ratio : Needs to be the comparing number. The production building with the highest number wins the upgrade. if the repair time is below the said limit.^^^^
 				}
                 break;
             case Harvester:
-				var a == "har"
-                if (building_level <= 2) {
+				if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated_logic(building_ID, modType, linkType)
-                }
-                break;
+					//if(type == ClientLib.Base.EResourceType.Crystal){
+					// var a = "blue_har"
+                    // Complicated_logic:
+					//var prodution_ratio = Production_Math(a);
+					//}
+					//break;
+					//if(type == ClientLib.Base.EResourceType.Tiberium){
+					// var a = "green_har"
+                    // Complicated_logic:
+					//var prodution_ratio = Production_Math(a);
+					//}
+				}
+				break;
             case PowerPlant:
-				var a == "p_p"
+				var a = "p_p"
                 if (building_level <= 2) {
                     // upgrade it
                 } else {
-                    // Complicated_logic(building_ID, modType, linkType)
+                    // Complicated_logic:
+					//prodution_ratio = Production_Math(a);
                 }
                 break;
             }
