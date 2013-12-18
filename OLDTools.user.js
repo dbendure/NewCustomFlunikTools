@@ -75,123 +75,130 @@
                                                 
                                                 startAutoUpdate : function() {
                                                         //var _this = window.FlunikTools.Main.getInstance();
-                                                        //var a = this.autoUpgrade();
-                                                        this.autoUpdateHandle = window.setInterval(this.autoUpgrade, 60000);
+                                                        //this.autoUpgrade();
+                                                        this.autoUpdateHandle = window.setInterval(this.BuildingautoUpgrade, 5000);
                                                 },
                                                 stopAutoUpdate : function() {
+													var a = 0;
                                                         window.clearInterval(this.autoUpdateHandle);
                                                         this.autoUpdateHandle = null;
                                                 },
                                                 
 												// Use
-                                                // this.canUpgradeUnit(unit, city)
-                                                // instead of
-                                                // unit.CanUpgrade()
-                                                //Thanks to KRS_L
-                                                canUpgradeUnit: function (unit, city) {
-                                                        var _this = FlunikTools.Main.getInstance();
-                                                        var nextLevel = unit.get_CurrentLevel() + 1;
-                                                        var gameDataTech = unit.get_UnitGameData_Obj();
-                                                        var hasEnoughResources = city.HasEnoughResources(ClientLib.Base.Util.GetTechLevelResourceRequirements_Obj(nextLevel, gameDataTech));
-                                                    if (gameDataTech == null || unit.get_IsDamaged() || city.get_IsLocked() || !hasEnoughResources) {
-                                                        return false;
-                                                    }
-                                                    var id = _this.getMainProductionBuildingMdbId(gameDataTech.pt, gameDataTech.f);
-                                                    var building = city.get_CityBuildingsData().GetBuildingByMDBId(id);
-                                                    if ((building == null) || (building.get_CurrentDamage() > 0)) {
-                                                        return false;
-                                                    }
-                                                    var levelReq = ClientLib.Base.Util.GetUnitLevelRequirements_Obj(nextLevel, gameDataTech);
-                                                        var reqTechIndexes = _this.getMissingTechIndexesFromTechLevelRequirement(levelReq, true, city);
-                                                    if ((reqTechIndexes != null) && (reqTechIndexes.length > 0)) {
-                                                        return false;
-                                                    }
-                                                    return true;
-                                                },
+						// this.canUpgradeUnit(unit, city)
+						// instead of
+						// unit.CanUpgrade()
+						//Thanks to KRS_L
+						canUpgradeUnit: function (unit, city) {
+							var _this = FlunikTools.Main.getInstance();
+							var nextLevel = unit.get_CurrentLevel() + 1;
+							var gameDataTech = unit.get_UnitGameData_Obj();
+							var hasEnoughResources = city.HasEnoughResources(ClientLib.Base.Util.GetTechLevelResourceRequirements_Obj(nextLevel, gameDataTech));
+						    if (gameDataTech == null || unit.get_IsDamaged() || city.get_IsLocked() || !hasEnoughResources) {
+						        return false;
+						    }
+						    var id = _this.getMainProductionBuildingMdbId(gameDataTech.pt, gameDataTech.f);
+						    var building = city.get_CityBuildingsData().GetBuildingByMDBId(id);
+						    if ((building == null) || (building.get_CurrentDamage() > 0)) {
+						        return false;
+						    }
+						    var levelReq = ClientLib.Base.Util.GetUnitLevelRequirements_Obj(nextLevel, gameDataTech);
+							var reqTechIndexes = _this.getMissingTechIndexesFromTechLevelRequirement(levelReq, true, city);
+						    if ((reqTechIndexes != null) && (reqTechIndexes.length > 0)) {
+						        return false;
+						    }
+						    return true;
+						},
 
+						getMainProductionBuildingMdbId: function (placementType, faction) {
+							var mdbId = -1;
+							var techNameId = -1;
+							if (placementType == 2) {
+								techNameId = 3;
+							} else {
+								techNameId = 4;
+							}
+							if (techNameId > 0) {
+								mdbId = ClientLib.Base.Tech.GetTechIdFromTechNameAndFaction(techNameId, faction);
+							}
+							return mdbId;
+						},
 
-                                                getMainProductionBuildingMdbId: function (placementType, faction) {
-                                                        var mdbId = -1;
-                                                        var techNameId = -1;
-                                                        if (placementType == 2) {
-                                                                techNameId = 3;
-                                                        } else {
-                                                                techNameId = 4;
-                                                        }
-                                                        if (techNameId > 0) {
-                                                                mdbId = ClientLib.Base.Tech.GetTechIdFromTechNameAndFaction(techNameId, faction);
-                                                        }
-                                                        return mdbId;
-                                                },
+						getMissingTechIndexesFromTechLevelRequirement: function (levelRequirements, breakAtFirst, city) {
+							var reqTechIndexes = [];
+							if (levelRequirements != null && levelRequirements.length > 0) {
+								for (var lvlIndex=0; (lvlIndex < levelRequirements.length); lvlIndex++) {
+									var lvlReq = levelRequirements[lvlIndex];
+									var requirementsMet = false;
+									var amountCounter = lvlReq.Amount;
+									for (var buildingIndex in city.get_Buildings().d) {
+										if (city.get_Buildings().d[buildingIndex].get_MdbBuildingId() == lvlReq.RequiredTechId && city.get_Buildings().d[buildingIndex].get_CurrentLevel() >= lvlReq.Level) {
+											amountCounter--;
+											if (amountCounter <= 0) {
+												requirementsMet=true;
+												break;
+											}
+										}
+									}
+									if (!requirementsMet) {
+										requirementsMet = ClientLib.Data.MainData.GetInstance().get_Player().get_PlayerResearch().IsResearchMinLevelAvailable(lvlReq.RequiredTechId, lvlReq.Level);
+									}
+									if (!requirementsMet) {
+										reqTechIndexes.push(lvlIndex);
+										if (breakAtFirst) {
+											return reqTechIndexes;
+										}
+									}
+								}
+							}
+							return reqTechIndexes;
+						},
+						
+						// Add the below function to your code and then use
+						// this.canUpgradeBuilding(building, city)
+						// instead of
+						// building.CanUpgrade()
+						//Thanks to KRS_L
 
-
-                                                getMissingTechIndexesFromTechLevelRequirement: function (levelRequirements, breakAtFirst, city) {
-                                                        var reqTechIndexes = [];
-                                                        if (levelRequirements != null && levelRequirements.length > 0) {
-                                                                for (var lvlIndex=0; (lvlIndex < levelRequirements.length); lvlIndex++) {
-                                                                        var lvlReq = levelRequirements[lvlIndex];
-                                                                        var requirementsMet = false;
-                                                                        var amountCounter = lvlReq.Amount;
-                                                                        for (var buildingIndex in city.get_Buildings().d) {
-                                                                                if (city.get_Buildings().d[buildingIndex].get_MdbBuildingId() == lvlReq.RequiredTechId && city.get_Buildings().d[buildingIndex].get_CurrentLevel() >= lvlReq.Level) {
-                                                                                        amountCounter--;
-                                                                                        if (amountCounter <= 0) {
-                                                                                                requirementsMet=true;
-                                                                                                break;
-                                                                                        }
-                                                                                }
-                                                                        }
-                                                                        if (!requirementsMet) {
-                                                                                requirementsMet = ClientLib.Data.MainData.GetInstance().get_Player().get_PlayerResearch().IsResearchMinLevelAvailable(lvlReq.RequiredTechId, lvlReq.Level);
-                                                                        }
-                                                                        if (!requirementsMet) {
-                                                                                reqTechIndexes.push(lvlIndex);
-                                                                                if (breakAtFirst) {
-                                                                                        return reqTechIndexes;
-                                                                                }
-                                                                        }
-                                                                }
-                                                        }
-                                                        return reqTechIndexes;
-                                                },
-                                                
-                                                // Add the below function to your code and then use
-                                                // this.canUpgradeBuilding(building, city)
-                                                // instead of
-                                                // building.CanUpgrade()
-                                                //Thanks to KRS_L
-
-
-                                                canUpgradeBuilding: function (building, city) {
-                                                        var nextLevel = (building.get_CurrentLevel() + 1);
-                                                        var gameDataTech = building.get_TechGameData_Obj();
-                                                        var hasEnoughResources = city.HasEnoughResources(ClientLib.Base.Util.GetTechLevelResourceRequirements_Obj(nextLevel, gameDataTech));
-                                                        return (!building.get_IsDamaged() && !city.get_IsLocked() && hasEnoughResources);
-                                                },
+						canUpgradeBuilding: function (building, city) {
+							var nextLevel = (building.get_CurrentLevel() + 1);
+							var gameDataTech = building.get_TechGameData_Obj();
+							var hasEnoughResources = city.HasEnoughResources(ClientLib.Base.Util.GetTechLevelResourceRequirements_Obj(nextLevel, gameDataTech));
+							//console.log( building.get_UnitGameData_Obj().dn);
+							return (!building.get_IsDamaged() && !city.get_IsLocked() && hasEnoughResources);
+						},
 												
-												Production_Math: function(city, building, Production, Package_Size, Time_To_Get_Package, LinkType0, LinkType1, LinkType2){
-													var building_Id = building.get_Id();
+												Production_Math: function(city, building_Id, Production, Package_Size, Time_To_Get_Package, LinkType0, LinkType1, LinkType2){
+													var Production_Value = -1;
+													var Package = -1;
+													var Package_Per_Hour = -1;
+													var type0 = -1;
+													var type1 = -1;
+													var type2 = -1;
+													var Total_Production = -1;
+													
 													if(city != null){
-														var Production_Value = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].TotalValue;
-														var Package = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Package_Size].TotalValue;
-														var Package_Per_Hour = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Time_To_Get_Package].TotalValue;
+													
+														Production_Value = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].TotalValue;
+														Package = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Package_Size].TotalValue;
+														Package_Per_Hour = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Time_To_Get_Package].TotalValue;
 														
 														if(city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType0] != undefined){
-															var type0 = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType0].Value;
+															type0 = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType0].Value;
 														}else{
-															var type0 = 0;
+															type0 = 0;
 														}
 														if(city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType1] != undefined){
-															var type1 = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType1].Value;
+															type1 = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType1].Value;
 														}else{
-															var type1 = 0;
+															type1 = 0;
 														}
 														if(city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType2] != undefined){
-															var type2 = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType2].Value;
+															type2 = city.GetBuildingCache(building_Id).DetailViewInfo.OwnProdModifiers.d[Production].ConnectedLinkTypes.d[LinkType2].Value;
 														}else{
-															var type2 = 0;
+															type2 = 0;
 														}
-														var Total_Production = Production_Value + (Package/(Package_Per_Hour/3600)) + type0 + type1 + type2;
+														Total_Production = Production_Value + (Package/(Package_Per_Hour/3600)) + type0 + type1 + type2;
 														
 														return Total_Production;
 													
@@ -199,9 +206,10 @@
 												},
 												
                                                 Building_Object: function(city, building, type){
-                                                        if(city != null && building != null){
+                                                        var building_obj = -1;
+														if(city != null && building != null){
 															if(type != null){
-																var building_obj = {
+																building_obj = {
 																		base_name: city.m_SupportDedicatedBaseName,
 																		building_name: building.get_UnitGameData_Obj().dn,
 																		Ratio: type,
@@ -211,7 +219,7 @@
 																		isPaid: true
 																	}
 																} else {
-																	var building_obj = {
+																	building_obj = {
 																			base_name: city.m_SupportDedicatedBaseName,
 																			building_name: building.get_UnitGameData_Obj().dn,
 																			cityid: city.get_Id(),
@@ -226,189 +234,177 @@
                                                 },
                                                 
                                                
-                                                autoUpgrade : function() {
-                                                        for (var nCity in ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d)
+                                                BuildingautoUpgrade : function() {
+																try{
+																var _this = window.FlunikTools.Main.getInstance();
+														for (var nCity in ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d)
                                                         {
+														try{
                                                                 var city = ClientLib.Data.MainData.GetInstance().get_Cities().get_AllCities().d[nCity];
                                                                 var buildings = city.get_Buildings();
-                                                                var airRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Aircraft, false);
+                                                                
+																var airRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Aircraft, false);
                                                                 var vehRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Vehicle, false);
                                                                 var infRT = city.get_CityUnitsData().GetRepairTimeFromEUnitGroup(ClientLib.Data.EUnitGroup.Infantry, false);
                                                                 var maxRT = Math.max(airRT, vehRT, infRT);
+																var TotalProduction = -1;
 																var LinkType0 = -1;
 																var LinkType1 = -1;
 																var LinkType2 = -1;
-                                                                var refarr = new Array();
-																var refnum = 0;
-																var powarr = new Array();
-																var pownum = 0;
-																var tibarr = new Array();
-																var tibnum = 0;
-																var cryarr = new Array();
-																var crynum = 0;
-                                                                for (var nBuildings in buildings.d) {
+																var Production = -1;
+																var PackageSize = -1;
+																var BonusTimeToComplete = -1;
+																var Build = -1;
+                                                                
+																
+																
+																var Package_Obj = null;
+                                                                var Building_Obj = null;
+																
+																for (var nBuildings in buildings.d) {
+																try{
                                                                         var building = buildings.d[nBuildings];
-                                                                        if(!this.canUpgradeBuilding(building, city))continue;
+																		//console.log(this.canUpgradeBuilding(building, city));
+																		try{
+																		if(_this.canUpgradeBuilding(building, city))continue;
+																		} catch (e) {
+																			console.log("can upgrade error: ", e, this.canUpgradeBuilding(building, city));
+																	}
+																		
                                                                         var tech = building.get_TechName();
                                                                         var name = building.get_UnitGameData_Obj().dn;
                                                                         var baseLvl = city.get_LvlBase();
                                                                         var defLvl = city.get_LvlDefense();
                                                                         var offLvl = city.get_LvlOffense();
-                                                                        var building_Id = building.get_Id();
                                                                         var buildinglvl = building.get_CurrentLevel();
-                                                                        
-                                                                        
-                                                                        switch (tech) {
-                                                                            case ClientLib.Base.ETechName.Factory:
-																				if(maxRT == vehRT)break;
-                                                                            case ClientLib.Base.ETechName.Barracks:
-																				if(maxRT == infRT)break;
-                                                                            case ClientLib.Base.ETechName.Airport:
-																				if(maxRT == airRT)break;
-                                                                                                                                
-                                                                            case ClientLib.Base.ETechName.Defense_Facility:
-                                                                                if (buildinglvl <= (defLvl + 3)) break;
-                                                                            case ClientLib.Base.ETechName.Command_Center:
-                                                                                if(buildinglvl <= offLvl)break;
-                                                                            case ClientLib.Base.ETechName.Defense_HQ:
-                                                                                if (buildinglvl <= defLvl) break;
-                                                                            case ClientLib.Base.ETechName.Construction_Yard:
-                                                                                if (buildinglvl <= baseLvl) break;
-                                                                                                                                
-                                                                            case ClientLib.Base.ETechName.Harvester:
-                                                                                if (buildinglvl <= 50) 
-                                                                                break;
-                                                                                                                                
-                                                                            case ClientLib.Base.ETechName.Refinery:
-                                                                                if (buildinglvl <= 50) 
-                                                                                        break;
-                                                                            case ClientLib.Base.ETechName.PowerPlant:
-                                                                                if (buildinglvl <= 50) 
-                                                                                        break;
-                                                                            case ClientLib.Base.ETechName.Accumulator:
-                                                                                if (buildinglvl <= 15) 
-                                                                                        break;
-                                                                            case ClientLib.Base.ETechName.Silo:
-                                                                                if (buildinglvl <= 15) 
-                                                                                        break;
-                                                                            case ClientLib.Base.ETechName.Support_Air:
-                                                                            case ClientLib.Base.ETechName.Support_Ion:
-                                                                            case ClientLib.Base.ETechName.Support_Art:
-                                                                               if (buildinglvl >= defLvl) break;
-                                                                        }
-																			
-																			if(building.get_ProducesPackages()){
-																				if(building.get_MainModifierTypeId() == ClientLib.Base.EModifierType.CreditsBonusTimeToComplete){
-																				refnum++;
-																					//if(refnum < 3){
-																					var CreditsProduction = ClientLib.Base.EModifierType.CreditsProduction;
-																					var CreditsPackageSize = ClientLib.Base.EModifierType.CreditsPackageSize;
-																					var CreditsBonusTimeToComplete = ClientLib.Base.EModifierType.CreditsBonusTimeToComplete;
-																					
-																					LinkType0 = ClientLib.Base.ELinkType.TiberiumCreditProduction;
-																					LinkType1 = ClientLib.Base.ELinkType.PowerplantCreditBonus;
-																					refarr[refnum] = this.Production_Math(city, building, CreditsProduction, CreditsPackageSize, CreditsBonusTimeToComplete, LinkType0, LinkType1, LinkType2);
-																					var Ref_Package_Obj = this.Building_Object(city, building, refarr[refnum]);
-																					//console.log(Ref_Package_Obj, refarr);
-																					
-																					//}
-																					break;
-																				}
+																		
+																		var building_Id = building.get_Id();
+                                                                        var isPackageBuilding = building.get_ProducesPackages();
+																		var MainModType = building.get_MainModifierTypeId();
+																		
+																		switch (tech) {
+																			case ClientLib.Base.ETechName.Factory:
+																				if(maxRT == vehRT){
+																				Build = 0;
+																				}break;
+																			case ClientLib.Base.ETechName.Barracks:
+																				if(maxRT == infRT){
+																				Build = 1;
+																				}break;
+																			case ClientLib.Base.ETechName.Airport:
+																				if(maxRT == airRT){
+																				Build = 2;
+																				}break;
+																																
+																			case ClientLib.Base.ETechName.Defense_Facility:
+																				if (buildinglvl <= (defLvl + 3)){
+																				Build = 3;
+																				}break;
+																			case ClientLib.Base.ETechName.Command_Center:
+																				if(buildinglvl <= offLvl){
+																				Build = 4;
+																				}break;
+																			case ClientLib.Base.ETechName.Defense_HQ:
+																				if (buildinglvl <= defLvl){
+																				Build = 5;
+																				}break;
+																			case ClientLib.Base.ETechName.Construction_Yard:
+																				if (buildinglvl <= baseLvl){
+																				Build = 6;
+																				}break;
+																			case ClientLib.Base.ETechName.Refinery : if(buildinglvl <= 2){
+																				Build = 7;
+																				Production = ClientLib.Base.EModifierType.CreditsProduction;
+																				PackageSize = ClientLib.Base.EModifierType.CreditsPackageSize;
+																				BonusTimeToComplete = ClientLib.Base.EModifierType.CreditsBonusTimeToComplete;
 																				
-																				if(building.get_MainModifierTypeId() == ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete){
-																				tibnum++;
-																					//if(tibnum < 3){
-																					var TiberiumProduction = ClientLib.Base.EModifierType.TiberiumProduction;
-																					var TiberiumPackageSize = ClientLib.Base.EModifierType.TiberiumPackageSize;
-																					var TiberiumBonusTimeToComplete = ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete;
-																					
-																					LinkType0 = ClientLib.Base.ELinkType.SiloTiberiumProduction;
-																					tibarr[tibnum] = this.Production_Math(city, building, TiberiumProduction, TiberiumPackageSize, TiberiumBonusTimeToComplete, LinkType0, LinkType1, LinkType2);
-																					var Tib_Package_Obj = this.Building_Object(city, building, tibarr[tibnum]);
-																					//console.log(this.Building_Object(city, building), tibarr);
-																					
-																					//}
-																					break;
+																				LinkType0 = ClientLib.Base.ELinkType.TiberiumCreditProduction;
+																				LinkType1 = ClientLib.Base.ELinkType.PowerplantCreditBonus;
+																				//TotalProduction = Math.round(this.Production_Math(city, building_Id, Production, PackageSize, BonusTimeToComplete, LinkType0, LinkType1, LinkType2));
+																				//Package_Obj = this.Building_Object(city, building, refarr[refnum]);
+																				//console.log(Package_Obj, refarr);
+																			}break;
+																			case ClientLib.Base.ETechName.PowerPlant :if(buildinglvl <= 2){
+																				Build = 8;
+																				Production = ClientLib.Base.EModifierType.PowerProduction;
+																				PackageSize = ClientLib.Base.EModifierType.PowerPackageSize;
+																				BonusTimeToComplete = ClientLib.Base.EModifierType.PowerBonusTimeToComplete;
+																				
+																				LinkType0 = ClientLib.Base.ELinkType.CrystalCreditProduction;
+																				LinkType1 = ClientLib.Base.ELinkType.AccumulatorPowerBonus;
+																				LinkType2 = ClientLib.Base.ELinkType.RefineryPowerBonus;
+																				//TotalProduction = Math.round(this.Production_Math(city, building_Id, Production, PackageSize, BonusTimeToComplete, LinkType0, LinkType1, LinkType2));
+																				//Package_Obj = this.Building_Object(city, building, powarr[pownum]);
+																				//console.log(Package_Obj, powarr);
+																			}break;
+																			case ClientLib.Base.ETechName.Harvester :if(buildinglvl <= 2){
+																				Build = 9;
+																				if(MainModType == ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete){
+																				Production = ClientLib.Base.EModifierType.TiberiumProduction;
+																				PackageSize = ClientLib.Base.EModifierType.TiberiumPackageSize;
+																				BonusTimeToComplete = ClientLib.Base.EModifierType.TiberiumBonusTimeToComplete;
+																				
+																				LinkType0 = ClientLib.Base.ELinkType.SiloTiberiumProduction;
+																				//TotalProduction = Math.round(this.Production_Math(city, building_Id, Production, PackageSize, BonusTimeToComplete, LinkType0, LinkType1, LinkType2));
+																				//Package_Obj = this.Building_Object(city, building, tibarr[tibnum]);
+																				//console.log(Package_Obj, tibarr);
 																				}
-																				if(building.get_MainModifierTypeId() == ClientLib.Base.EModifierType.CrystalBonusTimeToComplete){
-																				crynum++;
-																					//if(crynum < 3){
-																					var CrystalProduction = ClientLib.Base.EModifierType.CrystalProduction;
-																					var CrystalPackageSize = ClientLib.Base.EModifierType.CrystalPackageSize;
-																					var CrystalBonusTimeToComplete = ClientLib.Base.EModifierType.CrystalBonusTimeToComplete;
+																				else if(MainModType == ClientLib.Base.EModifierType.CrystalBonusTimeToComplete){
+																					Production = ClientLib.Base.EModifierType.CrystalProduction;
+																					PackageSize = ClientLib.Base.EModifierType.CrystalPackageSize;
+																					BonusTimeToComplete = ClientLib.Base.EModifierType.CrystalBonusTimeToComplete;
 																					
 																					LinkType0 = ClientLib.Base.ELinkType.SiloCrystalProduction;
-																					cryarr[crynum] = this.Production_Math(city, building, CrystalProduction, CrystalPackageSize, CrystalBonusTimeToComplete, LinkType0, LinkType1, LinkType2);
-																					var Cry_Package_Obj = this.Building_Object(city, building, cryarr[crynum]);
-																					//console.log(this.Building_Object(city, building), cryarr);
-																					
-																					//}
-																					break;
+																					//TotalProduction = Math.round(this.Production_Math(city, building_Id, Production, PackageSize, BonusTimeToComplete, LinkType0, LinkType1, LinkType2));
+																					//Package_Obj = this.Building_Object(city, building, cryarr[crynum]);
+																					//console.log(Package_Obj, cryarr);
 																				}
-																				if(building.get_MainModifierTypeId() == ClientLib.Base.EModifierType.PowerBonusTimeToComplete){
-																				pownum++
-																					//if(pownum < 3){
-																					var PowerProduction = ClientLib.Base.EModifierType.PowerProduction;
-																					var PowerPackageSize = ClientLib.Base.EModifierType.PowerPackageSize;
-																					var PowerBonusTimeToComplete = ClientLib.Base.EModifierType.PowerBonusTimeToComplete;
-																					
-																					LinkType0 = ClientLib.Base.ELinkType.CrystalCreditProduction;
-																					LinkType1 = ClientLib.Base.ELinkType.AccumulatorPowerBonus;
-																					LinkType2 = ClientLib.Base.ELinkType.RefineryPowerBonus;
-																					powarr[pownum] = this.Production_Math(city, building, PowerProduction, PowerPackageSize, PowerBonusTimeToComplete, LinkType0, LinkType1, LinkType2);
-																				   var Pow_Package_Obj = this.Building_Object(city, building, powarr[pownum]);
-																				   //console.log(this.Building_Object(city, building), powarr);
-																				   
-																					//}
-																					break;
-																				}
-																			}else{
-																			var Building_Obj = this.Building_Object(city, building);break;
+																			}break;
 																			
-                                                                                }
-                                                                                
-                                                                                
-                                                                        //}
+																			case ClientLib.Base.ETechName.Accumulator:
+																				if (buildinglvl <= 15){
+																				Build = 10;
+																				}break;
+																			case ClientLib.Base.ETechName.Silo:
+																				if (buildinglvl <= 15){
+																				Build = 11;
+																				}break;
+																			case ClientLib.Base.ETechName.Support_Air:
+																			case ClientLib.Base.ETechName.Support_Ion:
+																			case ClientLib.Base.ETechName.Support_Art:
+																			   if (buildinglvl <= (defLvl + 3)){
+																				Build = 12;
+																				}break;
+																			default :
+																				console.log("Building: "+name+" Found");break;
+																		}
+																		
+																if(Build > 0){
+																	if(Production > 0){
+																	console.log(Production);
+																	}
+																}
+															
                                                                         
-                                                                }
-																refarr.sort(function(a,b){return b-a});
-																tibarr.sort(function(a,b){return b-a});
-																cryarr.sort(function(a,b){return b-a});
-																powarr.sort(function(a,b){return b-a});
-																var Max_Total = Math.max(refarr[0], tibarr[0], cryarr[0], powarr[0]);
-																if(Ref_Package_Obj.Ratio == Max_Total){
-																console.log(Ref_Package_Obj);
-																 ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Ref_Package_Obj, null, null, true);
-																 refarr = []; tibarr = []; cryarr = []; powarr = []; break;
-																}
-																if(Tib_Package_Obj.Ratio == Max_Total){
-																console.log(Tib_Package_Obj);
-																ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Tib_Package_Obj, null, null, true);
-																refarr = []; tibarr = []; cryarr = []; powarr = []; break;
-																}
-																if(Cry_Package_Obj.Ratio == Max_Total){
-																console.log(Cry_Package_Obj);
-																ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Cry_Package_Obj, null, null, true);
-																refarr = []; tibarr = []; cryarr = []; powarr = []; break;
-																}
-																if( Pow_Package_Obj.Ratio == Max_Total){
-																console.log(Pow_Package_Obj);
-																ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Pow_Package_Obj, null, null, true);
-																refarr = []; tibarr = []; cryarr = []; powarr = []; break;
-																}
-																if(Building_Obj != null){
-																console.log(this.Building_Object(city, building));
-																ClientLib.Net.CommunicationManager.GetInstance().SendCommand("UpgradeBuilding", Building_Obj, null, null, true);
-																refarr = []; tibarr = []; cryarr = []; powarr = []; break;
-																}
-																
-																
-																//refarr = []; tibarr = []; cryarr = []; powarr = [];
-																
-                                                          
+                                                             break;
+														} catch (e) {
+                        console.log("Building error: ", e);
+                }		
                                                                 
                                                         }
+														} catch (e) {
+                        console.log("City error: ", e);
+                }
+														}
+														
+														console.log(Package_Obj, Building_Obj);
+														//refarr = []; tibarr = []; cryarr = []; powarr = [];
+												} catch (e) {
+                        console.log("Function error: ", e);
+                }		
                                                 }
+												
+												
                                         }
                                 });
                         }
